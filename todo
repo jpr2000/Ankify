@@ -1,0 +1,112 @@
+**My Todos**
+
+- Can update the system prompt and input directly to experiment with different outputs
+- Continue to query OpenAI when responses are shortened
+- sample prompts that I frequently use so I dont have to manually type them
+- Modal doesn't close when clicking off and clicking close actually closes the modal.
+
+- Ability to export via csv for other users
+   - Would be at least good to have some backup plan if Anki calls are failing
+
+- Long-term offline use
+   - Locally hosted model (like GTranslate) to do translation for you
+   - Could also pull from dictionary
+
+===
+- Remove saved words
+
+**General Improvements**
+- [ ] Add a clear project description and usage instructions to the README.md
+- [ ] Add screenshots or a demo GIF to the README.md
+- [ ] Add comments and documentation to backend and frontend code
+- [ ] Refactor code for readability and maintainability (e.g., modularize JS, extract inline styles/scripts)
+- [ ] Add error handling and user feedback for all API/network failures
+- [ ] Add input validation and sanitization on both frontend and backend
+
+**Frontend (index.html)**
+- [ ] Move inline JS and CSS to separate files (e.g., `main.js`, `styles.css`)
+- [ ] Add a favicon and improve meta tags for SEO/social sharing
+- [ ] Make the UI fully responsive and mobile-friendly (test on various devices)
+- [ ] Add loading indicators and error messages for all async actions
+- [ ] Add accessibility improvements (labels, ARIA, keyboard navigation)
+- [ ] Add user authentication if needed (for saving cards, etc.)
+- [ ] Add a settings page (e.g., to change language pairs, API keys, etc.)
+- [ ] Add a way to export/import saved sentences/cards
+- [ ] Add tests for frontend logic (unit and integration)
+
+**Backend (deepl-proxy.js)**
+- [ ] Move sensitive keys (DEEPL, OpenAI) to `.env` and document this in README
+- [ ] Add rate limiting and security headers (e.g., helmet) for production
+- [ ] Add logging (with a library, not just console.log)
+- [ ] Add input validation (e.g., using Joi or express-validator)
+- [ ] Add tests for API endpoints (unit and integration)
+- [ ] Add OpenAPI/Swagger documentation for the API
+- [ ] Add support for deployment environments (dev, prod)
+- [ ] Add Dockerfile and docker-compose for easy deployment
+- [ ] Add health check endpoint
+
+**Production Readiness**
+- [ ] Set up environment variables for all secrets and endpoints
+- [ ] Add HTTPS support (document how to set up SSL)
+- [ ] Add CI/CD pipeline (GitHub Actions, etc.) for linting, testing, and deployment
+- [ ] Deploy to a cloud provider (Vercel, Netlify, Heroku, AWS, etc.)
+- [ ] Monitor uptime and errors (e.g., with Sentry, LogRocket, or similar)
+- [ ] Set up proper CORS configuration for production
+- [ ] Add analytics (optional, privacy-respecting)
+
+**Quality & Community**
+- [ ] Add a code of conduct and contributing guidelines
+- [ ] Add issue and PR templates
+- [ ] Add license file
+
+Production TODOS:
+
+Absolutely! Here’s a focused production deployment checklist for your app, tailored for low-usage (just you), based on your todo file and best practices:
+
+---
+
+## Production Deployment Checklist
+
+### 1. Environment & Secrets
+- [ ] Move all sensitive keys (DEEPL, OpenAI, etc.) to a `.env` file (never commit this file).
+- [ ] Update code to read secrets from environment variables.
+- [ ] Document required environment variables in the README.
+
+### 2. Security & Stability
+- [ ] Add basic rate limiting to backend endpoints.
+- [ ] Add security headers (e.g., using helmet for Express).
+- [ ] Set up proper CORS configuration (restrict origins as needed).
+- [ ] Add input validation and sanitization on backend (e.g., Joi or express-validator).
+- [ ] Add error handling for all API/network failures.
+
+### 3. Deployment
+- [ ] Add a `Dockerfile` and (optionally) `docker-compose.yml` for easy deployment.
+- [ ] Add a health check endpoint to backend.
+- [ ] Set up HTTPS (self-signed or via a provider like Let’s Encrypt).
+- [ ] Choose a hosting provider (Vercel, Netlify, Heroku, AWS, etc.) and deploy.
+- [ ] Set up environment variables/secrets in the hosting provider’s dashboard.
+
+### 4. Monitoring & Maintenance
+- [ ] Add basic logging (use a library, not just console.log).
+- [ ] (Optional) Set up uptime/error monitoring (Sentry, LogRocket, or similar).
+
+### 5. Documentation & Usability
+- [ ] Add a clear project description and usage instructions to the README.
+- [ ] Document deployment steps and environment variables in the README.
+- [ ] (Optional) Add OpenAPI/Swagger docs for your API.
+
+### 6. Frontend
+- [ ] Make sure the UI is usable on your devices (basic responsiveness).
+- [ ] Add loading indicators and error messages for async actions.
+- [ ] Add a favicon and improve meta tags for SEO/social sharing.
+
+---
+
+**Minimum for a solo, low-usage deployment:**  
+If you want to keep it super simple, you can skip Docker and advanced monitoring, but you should still:
+- Use environment variables for secrets,
+- Add basic security (rate limiting, CORS, helmet),
+- Deploy to a host with HTTPS,
+- Document your setup for future reference.
+
+Let me know if you want a more detailed step-by-step for any of these!

@@ -1,0 +1,15 @@
+{
+  "name": "deepl-proxy-backend",
+  "version": "1.0.0",
+  "main": "deepl-proxy.js",
+  "type": "module",
+  "scripts": {
+    "start": "node deepl-proxy.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0"
+  }
+} 

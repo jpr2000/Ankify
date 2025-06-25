@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clickable Words App</title>
+  <style>
+    body {
+      background: #f4f7fa;
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      max-width: 420px;
+      width: 96vw;
+      margin: 32px 0 16px 0;
+      padding: 24px 18px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    h2, h3 {
+      margin: 0 0 8px 0;
+      font-weight: 700;
+      font-size: 1.18em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    h2 span, h3 span {
+      font-size: 1.1em;
+    }
+    label {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    textarea {
+      width: 100%;
+      border: 1.2px solid #c3d0e0;
+      border-radius: 7px;
+      padding: 9px;
+      font-size: 1em;
+      font-family: inherit;
+      background: #fafdff;
+      transition: border 0.2s;
+      resize: vertical;
+      min-height: 54px;
+      margin-bottom: 2px;
+    }
+    textarea:focus {
+      border: 1.2px solid #4a90e2;
+      outline: none;
+      background: #f0f6fa;
+    }
+    #translate-btn {
+      background: #4a90e2;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 10px 0;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: background 0.18s, transform 0.1s;
+      width: 100%;
+      letter-spacing: 0.01em;
+    }
+    #translate-btn:hover {
+      background: #357abd;
+      transform: translateY(-1px) scale(1.01);
+    }
+    .section-card {
+      background: #fafdff;
+      border: 1px solid #e3eaf5;
+      border-radius: 7px;
+      padding: 10px 8px;
+      min-height: 28px;
+      font-size: 1.04em;
+      word-break: break-word;
+      margin-bottom: 6px;
+    }
+    .word {
+      cursor: pointer;
+      padding: 2px 5px;
+      margin: 0 2px 0 0;
+      border-radius: 4px;
+      background: #e3f0fa;
+      transition: background 0.18s, transform 0.1s;
+      display: inline-block;
+      font-weight: 500;
+    }
+    .word:hover {
+      background: #b8e0fc;
+      transform: scale(1.07);
+    }
+    #saved-words {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      min-height: 24px;
+      margin-top: 4px;
+    }
+    .chip {
+      display: flex;
+      align-items: center;
+      background: #e0f7fa;
+      color: #00796b;
+      border-radius: 13px;
+      padding: 3px 10px 3px 9px;
+      font-size: 0.98em;
+      font-weight: 500;
+      margin-bottom: 2px;
+      position: relative;
+      animation: popIn 0.25s;
+    }
+    .chip .remove-chip {
+      margin-left: 5px;
+      cursor: pointer;
+      font-size: 1.1em;
+      color: #0097a7;
+      transition: color 0.18s;
+      user-select: none;
+    }
+    .chip .remove-chip:hover {
+      color: #d32f2f;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid #b3d6f6;
+      border-top: 2.5px solid #4a90e2;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-right: 7px;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .error-msg {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ffcdd2;
+      border-radius: 7px;
+      padding: 7px 10px;
+      margin: 7px 0 0 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+      font-size: 0.98em;
+    }
+    footer {
+      text-align: center;
+      color: #789;
+      font-size: 0.97em;
+      margin: 14px 0 8px 0;
+      opacity: 0.8;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 10px 2vw 10px 2vw;
+        max-width: 99vw;
+      }
+      h2, h3 {
+        font-size: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2><span aria-label="translate" title="Translate">🌐</span> Clickable Words App</h2>
+    <label for="input-en">Enter English text to translate and simplify</label>
+    <textarea id="input-en" rows="3" cols="60" placeholder="Enter English text..."></textarea>
+    <button id="translate-btn"><span aria-label="sync" title="Translate" style="font-size:1.1em;">🔄</span> Translate & Simplify</button>
+    <label for="system-prompt">System Prompt (for simplification)</label>
+    <textarea id="system-prompt" rows="2" style="font-size:0.98em;">Você é um assistente que simplifica textos para o nível B1 de português brasileiro.</textarea>
+    <label for="user-prompt">User Prompt (optional, overrides default)</label>
+    <textarea id="user-prompt" rows="2" style="font-size:0.98em;" placeholder="Will be auto-filled when translating, but you can edit..."></textarea>
+    <button id="generate-btn" style="margin-top:7px;background:#43b77a;color:#fff;border:none;border-radius:7px;padding:10px 0;font-size:1em;font-weight:600;cursor:pointer;width:100%;letter-spacing:0.01em;">Generate</button>
+    <h3><span aria-label="simplify" title="Simplified">📝</span> Output (PT-BR, B1):</h3>
+    <div id="text-container" class="section-card"></div>
+    <h3><span aria-label="star" title="Saved Sentences">⭐</span> Saved Sentences:</h3>
+    <div id="saved-words"></div>
+  </div>
+  <!-- Modal for sentence translation -->
+  <div id="modal-overlay" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;align-items:center;justify-content:center;">
+    <div id="modal" style="background:#fff;padding:28px 22px 18px 22px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.13);max-width:370px;width:92vw;display:flex;flex-direction:column;gap:14px;align-items:center;">
+      <textarea id="modal-sentence" style="font-weight:600;font-size:1.18em;text-align:center;resize:vertical;width:100%;min-height:70px;"></textarea>
+      <textarea id="modal-translation" style="min-height:54px;font-size:1.12em;color:#357abd;text-align:center;resize:vertical;width:100%;margin-top:8px;"></textarea>
+      <div style="display:flex;gap:18px;margin-top:10px;">
+        <button id="modal-confirm" style="background:#4a90e2;color:#fff;border:none;border-radius:7px;padding:8px 18px;font-size:1em;font-weight:600;cursor:pointer;">Confirm</button>
+        <button id="modal-close" style="background:#eee;color:#333;border:none;border-radius:7px;padding:8px 18px;font-size:1em;font-weight:500;cursor:pointer;">Close</button>
+      </div>
+    </div>
+  </div>
+  <footer>
+    © 2024 Clickable Words App
+  </footer>
+  <script src="key.js"></script>
+  <script>
+    const STORAGE_KEY = 'savedSentences';
+    const DEEPL_API_URL = 'https://api-free.deepl.com/v2/translate';
+
+    const inputEn = document.getElementById('input-en');
+    const translateBtn = document.getElementById('translate-btn');
+    const textContainer = document.getElementById('text-container');
+    const savedWordsDiv = document.getElementById('saved-words');
+    // Modal elements
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalSentence = document.getElementById('modal-sentence');
+    const modalTranslation = document.getElementById('modal-translation');
+    const modalConfirm = document.getElementById('modal-confirm');
+    const modalClose = document.getElementById('modal-close');
+    let modalCurrentSentence = '';
+
+    function getSavedWords() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    }
+
+    function saveWord(sentence) {
+      let sentences = getSavedWords();
+      if (!sentences.includes(sentence)) {
+        sentences.push(sentence);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(sentences));
+        renderSavedWords();
+      }
+    }
+
+    function saveCardToAnki(frontContent, backContent) {
+      // TODO: Make errors mobile viewable
+
+      fetch('http://localhost:5000/add-card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ frontContent, backContent })
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            console.error('Failed to save card to Anki:', data);
+          } else {
+            console.log('Card saved to Anki:', data);
+          }
+        })
+        .catch(error => {
+          console.error('Error saving card to Anki:', error);
+        });
+    }
+
+    function removeWord(sentence) {
+      let sentences = getSavedWords();
+      sentences = sentences.filter(s => s !== sentence);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sentences));
+      renderSavedWords();
+    }
+
+    function renderSavedWords() {
+      const sentences = getSavedWords();
+      savedWordsDiv.innerHTML = '';
+      if (sentences.length === 0) {
+        savedWordsDiv.innerHTML = '<span style="color:#aaa;">No sentences saved yet.</span>';
+        return;
+      }
+      sentences.forEach(sentence => {
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.textContent = sentence;
+        const removeBtn = document.createElement('span');
+        removeBtn.className = 'remove-chip';
+        removeBtn.textContent = '🗑️';
+        removeBtn.title = 'Remove';
+        removeBtn.onclick = () => removeWord(sentence);
+        chip.appendChild(removeBtn);
+        savedWordsDiv.appendChild(chip);
+      });
+    }
+
+    function openModal(sentence) {
+      modalCurrentSentence = sentence;
+      modalSentence.value = sentence;
+      modalTranslation.value = '';
+      modalTranslation.placeholder = 'Loading translation...';
+      modalOverlay.style.display = 'flex';
+      // Fetch translation from DeepL
+      fetch('http://localhost:5000/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: sentence, source_lang: 'PT', target_lang: 'EN' })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.translations && data.translations[0] && data.translations[0].text) {
+            modalTranslation.value = data.translations[0].text;
+            modalTranslation.placeholder = '';
+          } else {
+            modalTranslation.value = '';
+            modalTranslation.placeholder = 'Translation error.';
+          }
+        })
+        .catch(() => {
+          modalTranslation.value = '';
+          modalTranslation.placeholder = 'Translation error.';
+        });
+    }
+    function closeModal() {
+      modalOverlay.style.display = 'none';
+      modalCurrentSentence = '';
+    }
+    modalConfirm.onclick = function() {
+      if (modalSentence.value) {
+        saveWord(modalSentence.value);
+        saveCardToAnki(modalSentence.value, modalTranslation.value)
+      }
+      closeModal();
+    };
+    // modalClose.onclick = closeModal;
+    modalOverlay.onclick = function(e) {
+      if (e.target === modalOverlay) closeModal();
+    };
+
+    function renderText(ptText) {
+      textContainer.innerHTML = '';
+      const sentences = ptText.match(/[^.!?]+[.!?]+(\s|$)/g) || [ptText];
+      sentences.forEach((sentence, idx) => {
+        const span = document.createElement('span');
+        span.textContent = sentence.trim();
+        span.className = 'word';
+        span.style.display = 'inline-block';
+        span.style.margin = '0 0 8px 0';
+        span.onclick = () => openModal(sentence.trim());
+        textContainer.appendChild(span);
+        if (idx < sentences.length - 1) {
+          textContainer.appendChild(document.createTextNode(' '));
+        }
+      });
+    }
+
+    function showSpinner(target) {
+      target.innerHTML = '<span class="spinner"></span>Loading...';
+    }
+
+    function showError(target, message) {
+      target.innerHTML = `<div class="error-msg">❗ ${message}</div>`;
+    }
+
+    async function translateToPTBR(text) {
+      const res = await fetch('http://localhost:5000/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, source_lang: 'EN', target_lang: 'PT-BR' })
+      });
+      const data = await res.json();
+      if (data.translations && data.translations[0] && data.translations[0].text) {
+        return data.translations[0].text;
+      } else {
+        throw new Error('Proxy/DeepL API error: ' + JSON.stringify(data));
+      }
+    }
+
+    async function simplifyPTBRText(systemPrompt, userPrompt) {
+      const res = await fetch('http://localhost:5000/simplify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ systemPrompt, userPrompt })
+      });
+      const data = await res.json();
+      return data.simplified || '';
+    }
+
+    translateBtn.onclick = async () => {
+      const enText = inputEn.value.trim();
+      if (!enText) return;
+      showSpinner(textContainer);
+      try {
+        // Step 1: Get DeepL translation
+        const ptText = await translateToPTBR(enText);
+        // Step 2: Append DeepL translation to user prompt
+        const systemPrompt = document.getElementById('system-prompt').value.trim() || 'Você é um assistente que simplifica textos para o nível B1 de português brasileiro.';
+        const userPromptBox = document.getElementById('user-prompt');
+        let userPrompt = userPromptBox.value.trim();
+        if (!userPrompt) {
+          userPrompt = `Simplifique o texto abaixo para o nível B1 de português brasileiro, mantendo o significado original.\nTexto: ${ptText}`;
+        }
+        // Always append DeepL translation at the end
+        userPrompt += `\n\nTradução (PT-BR): ${ptText}`;
+        userPromptBox.value = userPrompt;
+        // Do NOT call OpenAI here anymore
+        textContainer.innerHTML = '<span style="color:#357abd;">Translation complete. Now click Generate to simplify.</span>';
+      } catch (e) {
+        showError(textContainer, e.message);
+      }
+    };
+
+    // Add Generate button logic
+    const generateBtn = document.getElementById('generate-btn');
+    generateBtn.onclick = async () => {
+      const systemPrompt = document.getElementById('system-prompt').value.trim() || 'Você é um assistente que simplifica textos para o nível B1 de português brasileiro.';
+      const userPrompt = document.getElementById('user-prompt').value.trim();
+      if (!userPrompt) {
+        showError(textContainer, 'User prompt is empty. Please translate first or enter a prompt.');
+        return;
+      }
+      showSpinner(textContainer);
+      try {
+        const simplePT = await simplifyPTBRText(systemPrompt, userPrompt);
+        renderText(simplePT);
+      } catch (e) {
+        showError(textContainer, e.message);
+      }
+    };
+
+    renderSavedWords();
+  </script>
+</body>
+</html> 
