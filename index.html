@@ -210,10 +210,19 @@
       </div>
     </div>
   </div>
+  <!-- Login Modal -->
+  <div id="login-modal-overlay" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:2000;align-items:center;justify-content:center;">
+    <div id="login-modal" style="background:#fff;padding:28px 22px 18px 22px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.13);max-width:370px;width:92vw;display:flex;flex-direction:column;gap:14px;align-items:center;">
+      <h3 style="margin-bottom:10px;">Login Required</h3>
+      <input id="login-username" type="text" placeholder="Username" style="width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #c3d0e0;">
+      <input id="login-password" type="password" placeholder="Password" style="width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #c3d0e0;">
+      <div id="login-error" style="color:#c62828;font-size:0.98em;min-height:18px;"></div>
+      <button id="login-submit" style="background:#4a90e2;color:#fff;border:none;border-radius:7px;padding:8px 18px;font-size:1em;font-weight:600;cursor:pointer;width:100%;">Login</button>
+    </div>
+  </div>
   <footer>
     © 2024 Clickable Words App
   </footer>
-  <script src="key.js"></script>
   <script>
     const STORAGE_KEY = 'savedSentences';
     const DEEPL_API_URL = 'https://api-free.deepl.com/v2/translate';
@@ -230,6 +239,13 @@
     const modalClose = document.getElementById('modal-close');
     let modalCurrentSentence = '';
 
+    // Login modal elements
+    const loginModalOverlay = document.getElementById('login-modal-overlay');
+    const loginUsername = document.getElementById('login-username');
+    const loginPassword = document.getElementById('login-password');
+    const loginError = document.getElementById('login-error');
+    const loginSubmit = document.getElementById('login-submit');
+
     function getSavedWords() {
       return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     }
@@ -243,10 +259,59 @@
       }
     }
 
+    const loginToBackend = async function() {
+      const username = loginUsername.value.trim();
+      const password = loginPassword.value;
+      if (!username || !password) {
+        loginError.textContent = 'Please enter both username and password.';
+        return;
+      }
+      loginError.textContent = 'Logging in...';
+      try {
+        const res = await fetch('http://localhost:5000/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (res.ok && data.token) {
+          localStorage.setItem('token', data.token);
+          hideLoginModal();
+          // window.location.reload();
+        } else {
+          loginError.textContent = data.error || 'Login failed.';
+        }
+      } catch (e) {
+        loginError.textContent = 'Network error.';
+      }
+    };
+
+    const fetchWithAuth = async (url, options = {}) => {
+      const token = localStorage.getItem('token');
+      const res = await fetch(
+        url, 
+        {
+          ...options,
+          headers: {
+            ...options.headers,
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      );
+
+      if (res.status === 401 || res.status === 403) {
+        localStorage.removeItem('token');
+        showLoginModal();
+        return;
+      }
+
+      return res;
+    }
+
     function saveCardToAnki(frontContent, backContent) {
       // TODO: Make errors mobile viewable
 
-      fetch('http://localhost:5000/add-card', {
+      fetchWithAuth('http://localhost:5000/add-card', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ frontContent, backContent })
@@ -299,7 +364,7 @@
       modalTranslation.placeholder = 'Loading translation...';
       modalOverlay.style.display = 'flex';
       // Fetch translation from DeepL
-      fetch('http://localhost:5000/translate', {
+      fetchWithAuth('http://localhost:5000/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: sentence, source_lang: 'PT', target_lang: 'EN' })
@@ -361,7 +426,7 @@
     }
 
     async function translateToPTBR(text) {
-      const res = await fetch('http://localhost:5000/translate', {
+      const res = await fetchWithAuth('http://localhost:5000/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, source_lang: 'EN', target_lang: 'PT-BR' })
@@ -375,7 +440,7 @@
     }
 
     async function simplifyPTBRText(systemPrompt, userPrompt) {
-      const res = await fetch('http://localhost:5000/simplify', {
+      const res = await fetchWithAuth('http://localhost:5000/simplify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ systemPrompt, userPrompt })
@@ -425,6 +490,30 @@
         showError(textContainer, e.message);
       }
     };
+
+    // Login modal logic
+    function showLoginModal() {
+      loginModalOverlay.style.display = 'flex';
+      loginError.textContent = '';
+      loginUsername.value = '';
+      loginPassword.value = '';
+      loginUsername.focus();
+    }
+
+    function hideLoginModal() {
+      loginModalOverlay.style.display = 'none';
+    }
+
+    loginSubmit.onclick = loginToBackend;
+
+    loginModalOverlay.onclick = function(e) {
+      if (e.target === loginModalOverlay) hideLoginModal();
+    };
+
+    // Show login modal on page load if no token
+    if (!localStorage.getItem('token')) {
+      showLoginModal();
+    }
 
     renderSavedWords();
   </script>

@@ -4,6 +4,7 @@
 - Continue to query OpenAI when responses are shortened
 - sample prompts that I frequently use so I dont have to manually type them
 - Modal doesn't close when clicking off and clicking close actually closes the modal.
+- Rename backend from deepl-proxy.js
 
 - Ability to export via csv for other users
    - Would be at least good to have some backup plan if Anki calls are failing
@@ -61,7 +62,7 @@
 
 Production TODOS:
 
-Absolutely! Here’s a focused production deployment checklist for your app, tailored for low-usage (just you), based on your todo file and best practices:
+Absolutely! Here's a focused production deployment checklist for your app, tailored for low-usage (just you), based on your todo file and best practices:
 
 ---
 
@@ -82,9 +83,9 @@ Absolutely! Here’s a focused production deployment checklist for your app, tai
 ### 3. Deployment
 - [ ] Add a `Dockerfile` and (optionally) `docker-compose.yml` for easy deployment.
 - [ ] Add a health check endpoint to backend.
-- [ ] Set up HTTPS (self-signed or via a provider like Let’s Encrypt).
+- [ ] Set up HTTPS (self-signed or via a provider like Let's Encrypt).
 - [ ] Choose a hosting provider (Vercel, Netlify, Heroku, AWS, etc.) and deploy.
-- [ ] Set up environment variables/secrets in the hosting provider’s dashboard.
+- [ ] Set up environment variables/secrets in the hosting provider's dashboard.
 
 ### 4. Monitoring & Maintenance
 - [ ] Add basic logging (use a library, not just console.log).
@@ -110,3 +111,9 @@ If you want to keep it super simple, you can skip Docker and advanced monitoring
 - Document your setup for future reference.
 
 Let me know if you want a more detailed step-by-step for any of these!
+
+**NOTE: JWT authentication is now required for all API routes except /login.**
+- Set AUTH_USERNAME, AUTH_PASSWORD_HASH, and JWT_SECRET in your .env file.
+- To generate a password hash for AUTH_PASSWORD_HASH, run this in Node.js:
+
+  node -e "console.log(require('bcryptjs').hashSync('yourpassword', 10))"

@@ -3,15 +3,58 @@ dotenv.config();
 import express from 'express';
 import fetch from 'node-fetch';
 import cors from 'cors';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 const app = express();
+
 const PORT = process.env.PORT || 5000;
-const DEEPL_API_KEY = process.env.DEEPL_API_KEY || 'YOUR_DEEPL_API_KEY_HERE';
+const DEEPL_API_KEY = process.env.DEEPL_API_KEY || '';
 const DEEPL_API_URL = 'https://api-free.deepl.com/v2/translate';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('ERROR: JWT_SECRET environment variable is not set. Set it in your .env file.');
+  process.exit(1);
+}
+const AUTH_USERNAME = process.env.AUTH_USERNAME || '';
+const AUTH_PASSWORD_HASH = process.env.AUTH_PASSWORD_HASH || '';
+
 
 app.use(cors());
 app.use(express.json());
+
+// JWT auth middleware
+function authenticateJWT(req, res, next) {
+  if (req.path === '/login') return next(); // Allow login route
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'No token provided' });
+  const token = authHeader.split(' ')[1];
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Invalid token' });
+    req.user = user;
+    next();
+  });
+}
+
+app.use(authenticateJWT);
+
+// Login route
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password required' });
+  }
+  if (username !== AUTH_USERNAME) {
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+  const valid = await bcrypt.compare(password, AUTH_PASSWORD_HASH);
+  if (!valid) {
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+  const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '2h' });
+  res.json({ token });
+});
 
 app.post('/translate', async (req, res) => {
   const { text, source_lang, target_lang } = req.body;
@@ -30,7 +73,7 @@ app.post('/translate', async (req, res) => {
     params.append('source_lang', source_lang);
     params.append('target_lang', target_lang);
     console.log(params);
-    const deeplRes = await fetch(DEEPL_API_URL, { 
+    const deeplRes = await fetch(DEEPL_API_URL, {
       method: 'POST',
       headers: {
         'Authorization': `DeepL-Auth-Key ${DEEPL_API_KEY}`,
@@ -112,7 +155,7 @@ app.post('/add-card', async (req, res) => {
     });
 
     const data = await response.json();
-    
+
     // Check if AnkiConnect returned an error
     if (data.error) {
       return res.status(500).json({ error: data.error });
@@ -166,6 +209,8 @@ app.post('/simplify', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
 
 app.listen(PORT, () => {
   console.log(`Backend Ankify server running on ${PORT}`);
