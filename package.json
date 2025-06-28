@@ -1,10 +1,10 @@
 {
-  "name": "deepl-proxy-backend",
+  "name": "server",
   "version": "1.0.0",
-  "main": "deepl-proxy.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node deepl-proxy.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

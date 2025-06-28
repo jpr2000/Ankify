@@ -12,6 +12,13 @@
 - Long-term offline use
    - Locally hosted model (like GTranslate) to do translation for you
    - Could also pull from dictionary
+   - Could even try something like Gemma
+
+- Ability to click on a word and have a tooltip show the translation
+   - A lot less invasive than an entire modal
+   - Curious how we can differentiate between word translation and an entire sentence
+      - Could we start with word tooltip and but then we can expand it to include the entire sentence if clicked on?
+   - Could use LinQ as inspiration
 
 ===
 - Remove saved words
@@ -36,7 +43,6 @@
 - [ ] Add tests for frontend logic (unit and integration)
 
 **Backend (deepl-proxy.js)**
-- [ ] Move sensitive keys (DEEPL, OpenAI) to `.env` and document this in README
 - [ ] Add rate limiting and security headers (e.g., helmet) for production
 - [ ] Add logging (with a library, not just console.log)
 - [ ] Add input validation (e.g., using Joi or express-validator)
@@ -44,7 +50,6 @@
 - [ ] Add OpenAPI/Swagger documentation for the API
 - [ ] Add support for deployment environments (dev, prod)
 - [ ] Add Dockerfile and docker-compose for easy deployment
-- [ ] Add health check endpoint
 
 **Production Readiness**
 - [ ] Set up environment variables for all secrets and endpoints
@@ -69,8 +74,6 @@ Absolutely! Here's a focused production deployment checklist for your app, tailo
 ## Production Deployment Checklist
 
 ### 1. Environment & Secrets
-- [ ] Move all sensitive keys (DEEPL, OpenAI, etc.) to a `.env` file (never commit this file).
-- [ ] Update code to read secrets from environment variables.
 - [ ] Document required environment variables in the README.
 
 ### 2. Security & Stability

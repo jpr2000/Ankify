@@ -26,7 +26,7 @@ app.use(express.json());
 
 // JWT auth middleware
 function authenticateJWT(req, res, next) {
-  if (req.path === '/login') return next(); // Allow login route
+  if (req.path === '/login' || req.path === '/health') return next(); // Allow login route
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: 'No token provided' });
   const token = authHeader.split(' ')[1];
@@ -211,6 +211,7 @@ app.post('/simplify', async (req, res) => {
 });
 
 
+app.get('/health', (req, res) => res.status(200).json({ status: "Healthy!"}))
 
 app.listen(PORT, () => {
   console.log(`Backend Ankify server running on ${PORT}`);
