@@ -1,5 +1,9 @@
 **My Todos**
 
+- Update prompt and fix bugs:
+"Você é um assistente que simplifica textos para o nível A2 de português brasileiro. Make sure to translate THE ENTIRE TEXT"
+- Add pages for easier navigation
+
 - Can update the system prompt and input directly to experiment with different outputs
 - Continue to query OpenAI when responses are shortened
 - sample prompts that I frequently use so I dont have to manually type them

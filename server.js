@@ -198,11 +198,12 @@ app.post('/simplify', async (req, res) => {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        max_tokens: 512,
+        max_tokens: 10000,
         temperature: 0.7
       })
     });
     const data = await openaiRes.json();
+    console.log(data)
     const simplified = data.choices?.[0]?.message?.content?.trim() || '';
     res.json({ simplified });
   } catch (err) {

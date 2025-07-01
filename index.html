@@ -220,7 +220,7 @@
     </div>
   </div>
   <footer>
-    © 2024 Clickable Words App
+    © 2025 Clickable Words App
   </footer>
   <script>
     const STORAGE_KEY = 'savedSentences';
@@ -401,7 +401,7 @@
 
     function renderText(ptText) {
       textContainer.innerHTML = '';
-      const sentences = ptText.match(/[^.!?]+[.!?]+(\s|$)/g) || [ptText];
+      const sentences = ptText.match(/[^.!?]+[.!?]+(\s|.|$)/g) || [ptText];
       sentences.forEach((sentence, idx) => {
         const span = document.createElement('span');
         span.textContent = sentence.trim();
